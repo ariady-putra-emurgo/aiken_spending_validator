@@ -25,7 +25,7 @@ validator check_datum {
   }
 
   else(_) {
-    False
+    fail
   }
 }
 
@@ -42,7 +42,7 @@ validator check_redeemer {
   }
 
   else(_) {
-    False
+    fail
   }
 }
 
@@ -58,7 +58,7 @@ validator sc_wallet(pkh: VerificationKeyHash) {
   }
 
   else(_) {
-    False
+    fail
   }
 }
 
@@ -70,12 +70,10 @@ validator receipts(pkh: VerificationKeyHash) {
     expect tx.extra_signatories |> list.has(pkh)
 
     // must spend something from the contract address
-    let script_inputs_o_ref_list =
-      filter_map_script_inputs(
-        tx.inputs,
-        policy_id,
-        fn(input) { input.output_reference },
-      )
+    let script_inputs_o_ref_list = {
+      let input <- filter_map_script_inputs(tx.inputs, policy_id)
+      input.output_reference
+    }
     expect script_inputs_o_ref_list != []
 
     // must mint the expected asset-name receipt-NFT with asset-qty == 1
@@ -103,7 +101,7 @@ validator receipts(pkh: VerificationKeyHash) {
   }
 
   else(_) {
-    False
+    fail
   }
 }
 
@@ -166,6 +164,6 @@ validator cip_68 {
   }
 
   else(_) {
-    False
+    fail
   }
 }
