@@ -1,65 +1,60 @@
 # aiken_spending_validator
 
-Write validators in the `validators` folder, and supporting functions in the `lib` folder using `.ak` as a file extension.
+This showcase project contains 5 validators:
 
-```aiken
-validator my_first_validator {
-  spend(_datum: Option<Data>, _redeemer: Data, _output_reference: Data, _context: Data) {
-    True
-  }
-}
+- `check_datum`
+- `check_redeemer`
+- `sc_wallet`
+- `receipts`
+- `cip_68`
+
+To run the offchain:
+
+1. Create a `.env.local` file
+2. Run `pnpm dev`
+
+Your `.env.local` file must contain:
+
+```
+NEXT_PUBLIC_BF_URL=https://cardano-preprod.blockfrost.io/api/v0
+NEXT_PUBLIC_BF_PID=preprodYOUR_PREPROD_BLOCKFROST_PROJECT_ID
+NEXT_PUBLIC_CARDANO_NETWORK=Preprod
 ```
 
-## Building
+To install `pnpm` run `npm i -g pnpm`.
 
-```sh
-aiken build
-```
+## `check_datum`
 
-## Configuring
+In this spending validator, we see one way to work with `Option` using `when-is`.
 
-**aiken.toml**
-```toml
-[config.default]
-network_id = 41
-```
+See:
 
-Or, alternatively, write conditional environment modules under `env`.
+- `Option`: https://aiken-lang.org/language-tour/primitive-types#option
+- `when-is`: https://aiken-lang.org/language-tour/custom-types#pattern-matching
 
-## Testing
+## `check_redeemer`
 
-You can write tests in any module using the `test` keyword. For example:
+Here, we see another way to work with `Option` using the `aiken/option.{or_else}` utility function.
 
-```aiken
-use config
+See: https://aiken-lang.github.io/stdlib/aiken/option.html#or_else
 
-test foo() {
-  config.network_id + 1 == 42
-}
-```
+## `sc_wallet`
 
-To run all tests, simply do:
+With this validator, we see how we can provide a script parameter.
 
-```sh
-aiken check
-```
+## `receipts`
 
-To run only tests matching the string `foo`, do:
+This validator explores the concept of:
 
-```sh
-aiken check -m foo
-```
+- **Receipts** as mentioned on the Aiken's **Common Design Patterns** page: https://aiken-lang.org/fundamentals/common-design-patterns#receipts
+- **Transaction-level validation via minting-policies** by **AnastasiaLabs**: https://github.com/Anastasia-Labs/design-patterns/blob/main/transaction-level-validator-minting-policy/TRANSACTION-LEVEL-VALIDATION-MINTING-POLICY.md#transaction-level-validation-via-minting-policies
 
-## Documentation
+We see how these 2 concepts can be combined together.
 
-If you're writing a library, you might want to generate an HTML documentation for it.
+## `cip_68`
 
-Use:
+This is our validator for the CIP-68 token minting and metadata updating.
 
-```sh
-aiken docs
-```
+See: https://developers.cardano.org/docs/governance/cardano-improvement-proposals/CIP-0068
 
-## Resources
-
-Find more on the [Aiken's user manual](https://aiken-lang.org).
+The logic of this validator is somewhat arbitrary, the important concept of CIP-68 can be seen at the transaction building on the offchain code.
