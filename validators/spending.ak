@@ -139,6 +139,7 @@ validator cip_68 {
     expect Some(input) = tx.inputs |> transaction.find_input(o_ref)
     expect Script(policy_id) = input.output.address.payment_credential
     expect [Pair(ref_token_name, _)] =
+      // extract the input ref_token AssetName by self PolicyID
       input.output.value |> value.to_pairs(policy_id)
     let token_name = ref_token_name |> bytearray.drop(4)
     expect {
@@ -156,9 +157,16 @@ validator cip_68 {
     expect InlineDatum(metadata) = output.datum
     expect _: Cip68 = metadata
     expect [Pair(o_ref_token_name, _)] =
+      // extract the output ref_token AssetName by self PolicyID
       output.value |> value.to_pairs(policy_id)
     and {
       o_ref_token_name == ref_token_name,
+      // ☝🏻must resend ref_token with the same AssetName
+
+      output.address == input.output.address,
+      // ☝🏻prevent insufficient-staking-control vulnerability:
+      // https://library.mlabs.city/common-plutus-security-vulnerabilities#11.insufficientstakingkeycontrol
+
       output.reference_script == input.output.reference_script,
     }
   }
