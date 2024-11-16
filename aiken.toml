@@ -1,6 +1,6 @@
 name = "ariady-putra-emurgo/aiken_spending_validator"
 version = "0.0.0"
-compiler = "v1.1.5"
+compiler = "v1.1.6"
 plutus = "v3"
 license = "Apache-2.0"
 description = "Aiken contracts for project 'ariady-putra-emurgo/aiken_spending_validator'"
