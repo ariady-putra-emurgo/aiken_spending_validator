@@ -1,23 +1,19 @@
 import { useEffect, useState } from "react";
+import * as siteConfig from "@/config/site";
 
 import WalletConnectors from "@/components/WalletConnectors";
 import Dashboard from "@/components/Dashboard";
 
-import { Address, Blockfrost, Lucid, LucidEvolution, Network } from "@lucid-evolution/lucid";
+import { Address, Koios, Lucid, LucidEvolution } from "@lucid-evolution/lucid";
 import { Wallet } from "@/types/cardano";
 
 export default function Home() {
-  const NETWORK = process.env.NEXT_PUBLIC_CARDANO_NETWORK as Network;
-  const BF_URL = `${process.env.NEXT_PUBLIC_BF_URL}`;
-  const BF_PID = `${process.env.NEXT_PUBLIC_BF_PID}`;
-  const BLOCKFROST = new Blockfrost(BF_URL, BF_PID);
-
   const [lucid, setLucid] = useState<LucidEvolution>();
   const [address, setAddress] = useState<Address>(""); // Address = string; eg. "addr_..."
   const [result, setResult] = useState("");
 
   useEffect(() => {
-    Lucid(BLOCKFROST, NETWORK).then(setLucid).catch(handleError);
+    Lucid(new Koios("/koios"), siteConfig.network).then(setLucid).catch(handleError);
     localStorage.clear();
   }, []);
 

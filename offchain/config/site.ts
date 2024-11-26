@@ -1,6 +1,5 @@
-export type SiteConfig = typeof siteConfig;
+import { Network } from "@lucid-evolution/lucid";
 
-export const siteConfig = {
-  name: "Next.js + NextUI",
-  description: "Make beautiful websites regardless of your design experience.",
-};
+export const name = "Offchain";
+export const description = "Next.js + NextUI";
+export const network: Network = "Preview";

@@ -1,3 +1,5 @@
+import * as siteConfig from "@/config/site";
+
 import { Accordion, AccordionItem } from "@nextui-org/accordion";
 
 import { ActionGroup } from "@/types/action";
@@ -85,14 +87,14 @@ export default function Dashboard(props: {
       deposit: async (lovelace: Lovelace) => {
         try {
           const spendingValidator: SpendingValidator = { type: "PlutusV3", script: Script.SpendCheckDatum };
-          const validatorAddress = validatorToAddress(lucid.config().network, spendingValidator);
+          const validatorAddress = validatorToAddress(siteConfig.network, spendingValidator);
 
           const datum = Data.to(42n);
 
           let newTx = lucid.newTx();
           newTx = splitOutputs(newTx, validatorAddress, datum, lovelace, 100);
 
-          const tx = await newTx.complete();
+          const tx = await newTx.complete({ localUPLCEval: false });
 
           submitTx(tx).then(setActionResult).catch(onError);
         } catch (error) {
@@ -103,12 +105,12 @@ export default function Dashboard(props: {
       withdraw: async () => {
         try {
           const spendingValidator: SpendingValidator = { type: "PlutusV3", script: Script.SpendCheckDatum };
-          const validatorAddress = validatorToAddress(lucid.config().network, spendingValidator);
+          const validatorAddress = validatorToAddress(siteConfig.network, spendingValidator);
 
           const utxos = await lucid.utxosAt(validatorAddress);
           const redeemer = Data.void();
 
-          const tx = await lucid.newTx().collectFrom(utxos, redeemer).attach.SpendingValidator(spendingValidator).complete();
+          const tx = await lucid.newTx().collectFrom(utxos, redeemer).attach.SpendingValidator(spendingValidator).complete({ localUPLCEval: false });
 
           submitTx(tx).then(setActionResult).catch(onError);
         } catch (error) {
@@ -121,7 +123,7 @@ export default function Dashboard(props: {
       deposit: async ({ lovelace, secret }: { lovelace: Lovelace; secret: string }) => {
         try {
           const spendingValidator: SpendingValidator = { type: "PlutusV3", script: Script.SpendCheckRedeemer };
-          const validatorAddress = validatorToAddress(lucid.config().network, spendingValidator);
+          const validatorAddress = validatorToAddress(siteConfig.network, spendingValidator);
 
           const hash = createHash("sha256").update(secret, "utf8").digest("hex");
           const datum = Data.to(hash);
@@ -129,7 +131,7 @@ export default function Dashboard(props: {
           let newTx = lucid.newTx();
           newTx = splitOutputs(newTx, validatorAddress, datum, lovelace, 75);
 
-          const tx = await newTx.complete();
+          const tx = await newTx.complete({ localUPLCEval: false });
 
           submitTx(tx).then(setActionResult).catch(onError);
         } catch (error) {
@@ -140,7 +142,7 @@ export default function Dashboard(props: {
       withdraw: async (secret: string) => {
         try {
           const spendingValidator: SpendingValidator = { type: "PlutusV3", script: Script.SpendCheckRedeemer };
-          const validatorAddress = validatorToAddress(lucid.config().network, spendingValidator);
+          const validatorAddress = validatorToAddress(siteConfig.network, spendingValidator);
 
           const hash = createHash("sha256").update(secret, "utf8").digest("hex");
           const utxos = (await lucid.utxosAt(validatorAddress)).filter(({ datum }) => datum && `${Data.from(datum, Data.Bytes())}` === hash);
@@ -148,7 +150,7 @@ export default function Dashboard(props: {
           const hex = fromText(secret);
           const redeemer = Data.to(hex);
 
-          const tx = await lucid.newTx().collectFrom(utxos, redeemer).attach.SpendingValidator(spendingValidator).complete();
+          const tx = await lucid.newTx().collectFrom(utxos, redeemer).attach.SpendingValidator(spendingValidator).complete({ localUPLCEval: false });
 
           submitTx(tx).then(setActionResult).catch(onError);
         } catch (error) {
@@ -163,14 +165,14 @@ export default function Dashboard(props: {
           const pkh = paymentCredentialOf(address).hash;
           const spendingScript = applyParamsToScript(Script.SpendScWallet, [pkh]);
           const spendingValidator: SpendingValidator = { type: "PlutusV3", script: spendingScript };
-          const validatorAddress = validatorToAddress(lucid.config().network, spendingValidator);
+          const validatorAddress = validatorToAddress(siteConfig.network, spendingValidator);
 
           const datum = Data.void();
 
           let newTx = lucid.newTx();
           newTx = splitOutputs(newTx, validatorAddress, datum, lovelace, 50);
 
-          const tx = await newTx.complete();
+          const tx = await newTx.complete({ localUPLCEval: false });
 
           submitTx(tx).then(setActionResult).catch(onError);
         } catch (error) {
@@ -183,12 +185,17 @@ export default function Dashboard(props: {
           const pkh = paymentCredentialOf(address).hash;
           const spendingScript = applyParamsToScript(Script.SpendScWallet, [pkh]);
           const spendingValidator: SpendingValidator = { type: "PlutusV3", script: spendingScript };
-          const validatorAddress = validatorToAddress(lucid.config().network, spendingValidator);
+          const validatorAddress = validatorToAddress(siteConfig.network, spendingValidator);
 
           const utxos = await lucid.utxosAt(validatorAddress);
           const redeemer = Data.void();
 
-          const tx = await lucid.newTx().collectFrom(utxos, redeemer).attach.SpendingValidator(spendingValidator).addSigner(address).complete();
+          const tx = await lucid
+            .newTx()
+            .collectFrom(utxos, redeemer)
+            .attach.SpendingValidator(spendingValidator)
+            .addSigner(address)
+            .complete({ localUPLCEval: false });
 
           submitTx(tx).then(setActionResult).catch(onError);
         } catch (error) {
@@ -203,14 +210,14 @@ export default function Dashboard(props: {
           const pkh = paymentCredentialOf(address).hash;
           const spendingScript = applyParamsToScript(Script.Receipts, [pkh]);
           const spendingValidator: SpendingValidator = { type: "PlutusV3", script: spendingScript };
-          const validatorAddress = validatorToAddress(lucid.config().network, spendingValidator);
+          const validatorAddress = validatorToAddress(siteConfig.network, spendingValidator);
 
           const datum = Data.void();
 
           let newTx = lucid.newTx();
           newTx = splitOutputs(newTx, validatorAddress, datum, lovelace, 25);
 
-          const tx = await newTx.complete();
+          const tx = await newTx.complete({ localUPLCEval: false });
 
           submitTx(tx).then(setActionResult).catch(onError);
         } catch (error) {
@@ -224,7 +231,7 @@ export default function Dashboard(props: {
           const receiptScript = applyParamsToScript(Script.Receipts, [pkh]);
 
           const spendingValidator: SpendingValidator = { type: "PlutusV3", script: receiptScript };
-          const validatorAddress = validatorToAddress(lucid.config().network, spendingValidator);
+          const validatorAddress = validatorToAddress(siteConfig.network, spendingValidator);
 
           const mintingPolicy: MintingPolicy = { type: "PlutusV3", script: receiptScript };
           const policyID = mintingPolicyToId(mintingPolicy);
@@ -247,7 +254,7 @@ export default function Dashboard(props: {
             .mintAssets(mintedAssets, redeemer)
             .attach.MintingPolicy(mintingPolicy)
             .addSigner(address)
-            .complete();
+            .complete({ localUPLCEval: false });
 
           submitTx(tx).then(setActionResult).catch(onError);
         } catch (error) {
@@ -271,7 +278,7 @@ export default function Dashboard(props: {
           const redeemer = Data.void();
 
           const spendingValidator: SpendingValidator = { type: "PlutusV3", script: Script.Cip68 };
-          const validatorAddress = validatorToAddress(lucid.config().network, spendingValidator);
+          const validatorAddress = validatorToAddress(siteConfig.network, spendingValidator);
 
           const mintingPolicy: MintingPolicy = { type: "PlutusV3", script: Script.Cip68 };
           const policyID = mintingPolicyToId(mintingPolicy);
@@ -306,7 +313,7 @@ export default function Dashboard(props: {
                 [refUnit]: 1n,
               }
             )
-            .complete();
+            .complete({ localUPLCEval: false });
 
           submitTx(tx).then(setActionResult).catch(onError);
         } catch (error) {
@@ -316,7 +323,7 @@ export default function Dashboard(props: {
 
       update: async ({ name, image }: { name: string; image: string }) => {
         try {
-          if (name.length > 64) throw "Asset Name is too long!";
+          if (name.length > 32) throw "Asset Name is too long!";
           if (image.length > 64) throw "Asset Image URL is too long!";
 
           const metadata = Data.fromJson({ name, image });
@@ -328,7 +335,7 @@ export default function Dashboard(props: {
           const redeemer = Data.void();
 
           const spendingValidator: SpendingValidator = { type: "PlutusV3", script: Script.Cip68 };
-          const validatorAddress = validatorToAddress(lucid.config().network, spendingValidator);
+          const validatorAddress = validatorToAddress(siteConfig.network, spendingValidator);
 
           const refUnit = localStorage.getItem("refUnit");
           const usrUnit = localStorage.getItem("usrUnit");
@@ -349,7 +356,7 @@ export default function Dashboard(props: {
                 [refUnit]: 1n,
               }
             )
-            .complete();
+            .complete({ localUPLCEval: false });
 
           submitTx(tx).then(setActionResult).catch(onError);
         } catch (error) {

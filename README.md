@@ -8,20 +8,12 @@ This showcase project contains 5 validators:
 - `receipts`
 - `cip_68`
 
-To run the offchain:
+Install `pnpm` if you have not by running `npm i -g pnpm`, and then go to [`offchain`](./offchain):
 
-1. Create a `.env.local` file
-2. Run `pnpm dev`
+- Run `pnpm i` if you have never run the `offchain`
+- Run `pnpm dev` to run the `offchain`
 
-Your `.env.local` file must contain:
-
-```
-NEXT_PUBLIC_BF_URL=https://cardano-preprod.blockfrost.io/api/v0
-NEXT_PUBLIC_BF_PID=preprodYOUR_PREPROD_BLOCKFROST_PROJECT_ID
-NEXT_PUBLIC_CARDANO_NETWORK=Preprod
-```
-
-To install `pnpm` run `npm i -g pnpm`.
+Open http://localhost:3000
 
 ## `check_datum`
 
