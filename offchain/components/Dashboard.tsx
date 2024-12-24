@@ -28,12 +28,13 @@ import {
   toUnit,
   TxBuilder,
   TxSignBuilder,
+  Validator,
   validatorToAddress,
 } from "@lucid-evolution/lucid";
 
 const Script = {
   SpendCheckDatum: applyDoubleCborEncoding(
-    "58fa01010032323232323232323225333003323232323253330083370e900118051baa001132332253333330120051533300b3370e900018069baa0051533300f300e375400a2a66601666e1d2000300d37540022a66601666e1cdd6980818071baa001481505288a9980624810f69203d3d203432203f2046616c73650014a02940028028028028028028c038004c038c03c004c02cdd50008b1806180680198058011805001180500098031baa001149854cc01124011856616c696461746f722072657475726e65642066616c73650013656153300249010f5f72656465656d65723a20566f696400165734ae7155ceaab9e5573eae855d12ba41"
+    "59010801010032323232323232323225333003323232323253330083370e900118051baa001132332253333330120051533300b3370e900018069baa0051533300f300e375400a2a66601666e1d2000300d37540022a66601666e1cdd6980818071baa001481505288a9980624810f69203d3d203432203f2046616c73650014a02a66018921084e6f20446174756d001600a00a00a00a00a00a300e001300e300f001300b37540022c6018601a006601600460140046014002600c6ea8004526153300449011856616c696461746f722072657475726e65642066616c73650013656153300249010f5f72656465656d65723a20566f696400165734ae7155ceaab9e5573eae855d12ba41"
   ),
 
   SpendCheckRedeemer: applyDoubleCborEncoding(
@@ -41,11 +42,11 @@ const Script = {
   ),
 
   SpendScWallet: applyDoubleCborEncoding(
-    "59013f010100323232323232323232232253330053232323232533300a3370e900118061baa001132332253333330140051533300d3370e900018079baa005153330113010375400a2a66601a64660020026eb0c04cc050c050c050c050c050c050c050c050c044dd50039129998098008a501332253330113371e00401c29444cc010010004dd7180a000980a8008a51153300e49012b6c6973742e6861732874782e65787472615f7369676e61746f726965732c20706b6829203f2046616c73650014a0018018018018018018602000260206022002601a6ea800458c038c03c00cc034008c030008c030004c020dd50008a4c2a6600c92011856616c696461746f722072657475726e65642066616c73650013656375c0022a660049210f5f72656465656d65723a20566f696400165734ae7155ceaab9e5573eae855d12ba41"
+    "59011e01010032323232323232323232232253330053232323232533300a3370e900118061baa001132332253333330150051533300d3370e900018079baa005153330113010375400a2a66601a66ebcdd3998091ba900a4bd701809980a180a180a180a180a180a180a180a18081baa00614a22a6601c9201255b706b685d203d3d2074782e65787472615f7369676e61746f72696573203f2046616c73650014a0018018018018018018602200260226024002601a6ea800458c03cc04000cc038008c034008c034004c020dd50008a4c2a6600c92011856616c696461746f722072657475726e65642066616c73650013656375c0022a660049210f5f72656465656d65723a20566f696400165734ae7155ceaab9e5573eae815d0aba257481"
   ),
 
   Receipts: applyDoubleCborEncoding(
-    "5904e3010100323232323232323232322322533300532323232323232323253232323330113003007132533333301a00a153330123004301437540142a66602c602a6ea802854ccc048c8cc004004dd6180c980d180d180d180d180d180d180d180d180b1baa00c22533301800114a026644a66602c66e3c00804c5288998020020009bae301a001301b00113253330133330133375e6e9c0053010180004a094454ccc04cc010cc88c94ccc058c01cc060dd50008a400026eb4c070c064dd500099299980b1803980c1baa00114c103d87a8000132330010013756603a60346ea8008894ccc070004530103d87a8000132333222533301c337220100062a66603866e3c02000c4c030cc084dd400125eb80530103d87a8000133006006001375c60360026eb4c070004c080008c078004c8cc00400400c894ccc06c0045300103d87a8000132333222533301b337220140062a66603666e3c02800c4c02ccc080dd300125eb80530103d87a8000133006006001375c60340026eacc06c004c07c008c074004dd59804180b1baa00c37286eccdd38008a5115330144913f6173736574732e7175616e746974795f6f662874782e6d696e742c20706f6c6963795f69642c2061737365745f6e616d6529203d3d2031203f2046616c73650014a02a6602892125657870656374207363726970745f696e707574735f6f5f7265665f6c69737420213d205b5d001632330010013758600e602c6ea8030894ccc06000452f5c02664464a66602e601060326ea80044cc0140140084cc070c074c068dd50009980280280119299980b9804180c9baa001153330173371e6eb8c074c068dd5000803098039980e1805980d1baa0034bd700a60103d87a800014c103d87a8000300a30193754601460326ea8c024c064dd5001180d000980d8008a99809a492c6578706563742074782e65787472615f7369676e61746f72696573207c3e206c6973742e68617328706b68290016011011011011011011375c602e60286ea802054ccc044c00801c4c8cc894cccccc07003054ccc050c018c058dd50060a99980c180b9baa00c1325333015300730173754002264a66602c600e60306ea800454ccc058cdd79ba732330010013756601860346ea8040894ccc07000452f5c026603a6034603c00266004004603e0026e9ccc06cc070c064dd5000a5eb805288a9980ba492f6173736574732e706f6c69636965732874782e6d696e7429203d3d205b706f6c6963795f69645d203f2046616c73650014a02940c024c060dd51804980c1baa300830183754603660306ea800454cc0592413f65787065637420536f6d6528696e70757429203d2074782e696e70757473207c3e207472616e73616374696f6e2e66696e645f696e707574286f5f72656629001632330010013758601260306ea8038894ccc0680045300103d87a80001332253330183375e601860366ea80080184c020cc0740092f5c02660080080026038002603a00202602602602602602660300026030603200260286ea802058dd2a40006e1d2002370e90001180a180a8009180980091809180998099809980980098061baa001300f3010003300e002300d002300d001300837540022930a9980324811856616c696461746f722072657475726e65642066616c73650013656375c0022a660049210f5f72656465656d65723a20566f696400165734ae7155ceaab9e5573eae815d0aba257481"
+    "590485010100323232323232323232322322533300532323232323232323253232323330113003007132533333301a00a153330123004301437540142a66602c602a6ea802854ccc048cdd79ba733017375201e97ae030183019301930193019301930193019301930153754016264a66602666602666ebd3001018000374e0029412889919299980c8008010a99980c980e000899299980b18039bad301900113371e6eb8c060004dca1bb3374e008006603600200464a66602a600c602e6ea800452f5bded8c026eacc06cc060dd500099198008009bab300a3018375401c44a6660340022980103d87a8000132333222533301a337220120062a66603466e3c02400c4c028cc07cdd300125eb80530103d87a8000133006006001375c60320026eacc068004c078008c07000454cc0512410c496e76616c6964204d696e740016153301449125657870656374205b5d20213d207363726970745f696e707574735f6f5f7265665f6c697374001632330010013758600e602c6ea8030894ccc06000452f5c02664464a66602e601060326ea80044cc0140140084cc070c074c068dd50009980280280119299980b9804180c9baa001153330173371e6eb8c074c068dd5000803098039980e1805980d1baa0034bd700a60103d87a800014c103d87a8000300a30193754601460326ea8c024c064dd5001180d000980d8008a99809a4924657870656374205b706b685d203d3d2074782e65787472615f7369676e61746f726965730016011011011011011011375c602e60286ea802054ccc044c00801c4c8cc894cccccc07003054ccc050c018c058dd50060a99980c180b9baa00c1325333015300730173754002264a66602c600e60306ea800454ccc058cdd79ba732330010013756601860346ea8040894ccc07000452f5c026603a6034603c00266004004603e0026e9ccc06cc070c064dd5000a5eb805288a9980ba492f6173736574732e706f6c69636965732874782e6d696e7429203d3d205b706f6c6963795f69645d203f2046616c73650014a02a6602e921426578706563742053637269707428706f6c6963795f696429203d20696e7075742e6f75747075742e616464726573732e7061796d656e745f63726564656e7469616c0016300930183754601260306ea8c020c060dd5180d980c1baa00115330164913f65787065637420536f6d6528696e70757429203d2074782e696e70757473207c3e207472616e73616374696f6e2e66696e645f696e707574286f5f72656629001632330010013758601260306ea8038894ccc0680045300103d87a80001332253330183375e601860366ea80080184c020cc0740092f5c02660080080026038002603a00202602602602602602660300026030603200260286ea802058dd2a40006e1d2002370e90001180a180a8009180980091809180998099809980980098061baa001300f3010003300e002300d002300d001300837540022930a9980324811856616c696461746f722072657475726e65642066616c73650013656375c0022a660049210f5f72656465656d65723a20566f696400165734ae7155ceaab9e5573eae815d0aba257481"
   ),
 
   Cip68: applyDoubleCborEncoding(
@@ -94,7 +95,7 @@ export default function Dashboard(props: {
           let newTx = lucid.newTx();
           newTx = splitOutputs(newTx, validatorAddress, datum, lovelace, 100);
 
-          const tx = await newTx.complete({ localUPLCEval: false });
+          const tx = await newTx.complete();
 
           submitTx(tx).then(setActionResult).catch(onError);
         } catch (error) {
@@ -110,7 +111,7 @@ export default function Dashboard(props: {
           const utxos = await lucid.utxosAt(validatorAddress);
           const redeemer = Data.void();
 
-          const tx = await lucid.newTx().collectFrom(utxos, redeemer).attach.SpendingValidator(spendingValidator).complete({ localUPLCEval: false });
+          const tx = await lucid.newTx().collectFrom(utxos, redeemer).attach.SpendingValidator(spendingValidator).complete();
 
           submitTx(tx).then(setActionResult).catch(onError);
         } catch (error) {
@@ -131,7 +132,7 @@ export default function Dashboard(props: {
           let newTx = lucid.newTx();
           newTx = splitOutputs(newTx, validatorAddress, datum, lovelace, 75);
 
-          const tx = await newTx.complete({ localUPLCEval: false });
+          const tx = await newTx.complete();
 
           submitTx(tx).then(setActionResult).catch(onError);
         } catch (error) {
@@ -150,7 +151,7 @@ export default function Dashboard(props: {
           const hex = fromText(secret);
           const redeemer = Data.to(hex);
 
-          const tx = await lucid.newTx().collectFrom(utxos, redeemer).attach.SpendingValidator(spendingValidator).complete({ localUPLCEval: false });
+          const tx = await lucid.newTx().collectFrom(utxos, redeemer).attach.SpendingValidator(spendingValidator).complete();
 
           submitTx(tx).then(setActionResult).catch(onError);
         } catch (error) {
@@ -172,7 +173,7 @@ export default function Dashboard(props: {
           let newTx = lucid.newTx();
           newTx = splitOutputs(newTx, validatorAddress, datum, lovelace, 50);
 
-          const tx = await newTx.complete({ localUPLCEval: false });
+          const tx = await newTx.complete();
 
           submitTx(tx).then(setActionResult).catch(onError);
         } catch (error) {
@@ -190,12 +191,7 @@ export default function Dashboard(props: {
           const utxos = await lucid.utxosAt(validatorAddress);
           const redeemer = Data.void();
 
-          const tx = await lucid
-            .newTx()
-            .collectFrom(utxos, redeemer)
-            .attach.SpendingValidator(spendingValidator)
-            .addSigner(address)
-            .complete({ localUPLCEval: false });
+          const tx = await lucid.newTx().collectFrom(utxos, redeemer).attach.SpendingValidator(spendingValidator).addSigner(address).complete();
 
           submitTx(tx).then(setActionResult).catch(onError);
         } catch (error) {
@@ -208,16 +204,18 @@ export default function Dashboard(props: {
       deposit: async (lovelace: Lovelace) => {
         try {
           const pkh = paymentCredentialOf(address).hash;
-          const spendingScript = applyParamsToScript(Script.Receipts, [pkh]);
-          const spendingValidator: SpendingValidator = { type: "PlutusV3", script: spendingScript };
-          const validatorAddress = validatorToAddress(siteConfig.network, spendingValidator);
+
+          const receiptScript = applyParamsToScript(Script.Receipts, [pkh]);
+          const receiptValidator: SpendingValidator = { type: "PlutusV3", script: receiptScript };
+
+          const validatorAddress = validatorToAddress(siteConfig.network, receiptValidator);
 
           const datum = Data.void();
 
           let newTx = lucid.newTx();
           newTx = splitOutputs(newTx, validatorAddress, datum, lovelace, 25);
 
-          const tx = await newTx.complete({ localUPLCEval: false });
+          const tx = await newTx.complete();
 
           submitTx(tx).then(setActionResult).catch(onError);
         } catch (error) {
@@ -228,13 +226,12 @@ export default function Dashboard(props: {
       withdraw: async () => {
         try {
           const pkh = paymentCredentialOf(address).hash;
+
           const receiptScript = applyParamsToScript(Script.Receipts, [pkh]);
+          const receiptValidator: Validator = { type: "PlutusV3", script: receiptScript };
 
-          const spendingValidator: SpendingValidator = { type: "PlutusV3", script: receiptScript };
-          const validatorAddress = validatorToAddress(siteConfig.network, spendingValidator);
-
-          const mintingPolicy: MintingPolicy = { type: "PlutusV3", script: receiptScript };
-          const policyID = mintingPolicyToId(mintingPolicy);
+          const validatorAddress = validatorToAddress(siteConfig.network, receiptValidator);
+          const policyID = mintingPolicyToId(receiptValidator);
 
           const utxos = await lucid.utxosAt(validatorAddress);
           const redeemer = Data.void();
@@ -250,11 +247,11 @@ export default function Dashboard(props: {
           const tx = await lucid
             .newTx()
             .collectFrom(utxos, redeemer)
-            .attach.SpendingValidator(spendingValidator)
+            .attach.SpendingValidator(receiptValidator)
             .mintAssets(mintedAssets, redeemer)
-            .attach.MintingPolicy(mintingPolicy)
+            .attach.MintingPolicy(receiptValidator)
             .addSigner(address)
-            .complete({ localUPLCEval: false });
+            .complete();
 
           submitTx(tx).then(setActionResult).catch(onError);
         } catch (error) {
@@ -313,7 +310,7 @@ export default function Dashboard(props: {
                 [refUnit]: 1n,
               }
             )
-            .complete({ localUPLCEval: false });
+            .complete();
 
           submitTx(tx).then(setActionResult).catch(onError);
         } catch (error) {
@@ -356,7 +353,7 @@ export default function Dashboard(props: {
                 [refUnit]: 1n,
               }
             )
-            .complete({ localUPLCEval: false });
+            .complete();
 
           submitTx(tx).then(setActionResult).catch(onError);
         } catch (error) {

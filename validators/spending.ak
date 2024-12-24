@@ -1,4 +1,5 @@
 use aiken/cbor
+use aiken/collection/dict
 use aiken/collection/list
 use aiken/crypto.{VerificationKeyHash}
 use aiken/option
@@ -20,7 +21,7 @@ validator check_datum {
     // one way to deal with Option is by using when-is to extract its value
     when datum is {
       Some(i) -> (i == 42)?
-      None -> False
+      None -> fail @"No Datum"
     }
   }
 
@@ -48,13 +49,13 @@ validator check_redeemer {
 
 validator sc_wallet(pkh: VerificationKeyHash) {
   spend(
-    _datum: Option<Void>,
+    _datum: Option<Data>,
     _redeemer: Void,
     _o_ref: OutputReference,
     tx: Transaction,
   ) {
-    // allow spending whenever the transaction is signed by the PKH as specified in the script param
-    list.has(tx.extra_signatories, pkh)?
+    // allow spending whenever the transaction is signed only by the PKH as specified in the script param
+    ([pkh] == tx.extra_signatories)?
   }
 
   else(_) {
@@ -67,37 +68,40 @@ validator receipts(pkh: VerificationKeyHash) {
   /// https://aiken-lang.org/fundamentals/common-design-patterns#receipts
   mint(_redeemer: Void, policy_id: PolicyId, tx: Transaction) {
     // transaction level validation
-    expect tx.extra_signatories |> list.has(pkh)
+    expect [pkh] == tx.extra_signatories
 
     // must spend something from the contract address
     let script_inputs_o_ref_list = {
       let input <- filter_map_script_inputs(tx.inputs, policy_id)
       input.output_reference
     }
-    expect script_inputs_o_ref_list != []
+    expect [] != script_inputs_o_ref_list
 
-    // must mint the expected asset-name receipt-NFT with asset-qty == 1
-    let asset_name =
-      script_inputs_o_ref_list
-        |> cbor.serialise
-        |> crypto.blake2b_256
-    (assets.quantity_of(tx.mint, policy_id, asset_name) == 1)?
+    // must mint 1 receipt-NFT with the expected asset-name
+    when tx.mint |> assets.tokens(policy_id) |> dict.to_pairs() is {
+      [Pair(asset_name, 1)] ->
+        asset_name == (
+          script_inputs_o_ref_list
+            |> cbor.serialise
+            |> crypto.blake2b_256
+        )
+      _ -> fail @"Invalid Mint"
+    }
   }
 
   /// Transaction Level Validation via Minting Policies:
   /// https://github.com/Anastasia-Labs/design-patterns/blob/main/transaction-level-validator-minting-policy/TRANSACTION-LEVEL-VALIDATION-MINTING-POLICY.md#transaction-level-validation-via-minting-policies
   spend(
-    _datum: Option<Void>,
+    _datum: Option<Data>,
     _redeemer: Void,
     o_ref: OutputReference,
     tx: Transaction,
   ) {
     // delegate the validations to the minting script, which will only be executed once for the entire transaction
     expect Some(input) = tx.inputs |> transaction.find_input(o_ref)
-    when input.output.address.payment_credential is {
-      Script(policy_id) -> (assets.policies(tx.mint) == [policy_id])?
-      _ -> False
-    }
+    expect Script(policy_id) = input.output.address.payment_credential
+
+    (assets.policies(tx.mint) == [policy_id])?
   }
 
   else(_) {

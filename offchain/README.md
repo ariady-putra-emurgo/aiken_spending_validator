@@ -1,13 +1,11 @@
-# Next.js & NextUI Template
+# aiken-spending-validator-offchain
 
-This is a template for creating applications using Next.js 14 (app directory) and NextUI (v2).
-
-[Try it on CodeSandbox](https://githubbox.com/nextui-org/next-app-template)
+This is an offchain app for `aiken_spending_validator` using **Next.js** and **NextUI**.
 
 ## Technologies Used
 
-- [Next.js 14](https://nextjs.org/docs/getting-started)
-- [NextUI v2](https://nextui.org/)
+- [Next.js](https://nextjs.org/docs/getting-started)
+- [NextUI](https://nextui.org/)
 - [Tailwind CSS](https://tailwindcss.com/)
 - [Tailwind Variants](https://tailwind-variants.org)
 - [TypeScript](https://www.typescriptlang.org/)
@@ -16,37 +14,19 @@ This is a template for creating applications using Next.js 14 (app directory) an
 
 ## How to Use
 
-### Use the template with create-next-app
-
-To create a new project based on this template using `create-next-app`, run the following command:
-
-```bash
-npx create-next-app -e https://github.com/nextui-org/next-app-template
-```
-
 ### Install dependencies
 
-You can use one of them `npm`, `yarn`, `pnpm`, `bun`, Example using `npm`:
+Use `pnpm` by installing it using `npm i -g pnpm` if you have not, and then run:
 
 ```bash
-npm install
+pnpm i
 ```
 
 ### Run the development server
 
 ```bash
-npm run dev
+pnpm dev
 ```
-
-### Setup pnpm (optional)
-
-If you are using `pnpm`, you need to add the following code to your `.npmrc` file:
-
-```bash
-public-hoist-pattern[]=*@nextui-org/*
-```
-
-After modifying the `.npmrc` file, you need to run `pnpm install` again to ensure that the dependencies are installed correctly.
 
 ## License
 
