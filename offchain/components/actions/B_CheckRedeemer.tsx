@@ -43,7 +43,7 @@ export default function CheckRedeemer(props: { onDeposit: Action; onWithdraw: Ac
                 </ModalBody>
                 <ModalFooter>
                   <Button
-                    onClick={() => onDeposit({ lovelace, secret }).then(onClose)}
+                    onPress={() => onDeposit({ lovelace, secret }).then(onClose)}
                     className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg"
                     radius="full"
                   >
@@ -79,7 +79,7 @@ export default function CheckRedeemer(props: { onDeposit: Action; onWithdraw: Ac
                 </ModalBody>
                 <ModalFooter>
                   <Button
-                    onClick={() => onWithdraw(secret).then(onClose)}
+                    onPress={() => onWithdraw(secret).then(onClose)}
                     className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg"
                     radius="full"
                   >

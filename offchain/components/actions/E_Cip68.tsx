@@ -58,7 +58,7 @@ export default function Cip68(props: { onMint: Action; onUpdate: Action }) {
                 </ModalBody>
                 <ModalFooter>
                   <Button
-                    onClick={() => onMint({ name, image, label, qty }).then(onClose)}
+                    onPress={() => onMint({ name, image, label, qty }).then(onClose)}
                     className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg"
                     radius="full"
                   >
@@ -96,7 +96,7 @@ export default function Cip68(props: { onMint: Action; onUpdate: Action }) {
                 </ModalBody>
                 <ModalFooter>
                   <Button
-                    onClick={() => onUpdate({ name, image }).then(onClose)}
+                    onPress={() => onUpdate({ name, image }).then(onClose)}
                     className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg"
                     radius="full"
                   >

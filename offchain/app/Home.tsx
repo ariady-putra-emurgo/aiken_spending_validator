@@ -30,7 +30,6 @@ export default function Home() {
       try {
         const errorString = JSON.stringify(error);
         const errorJSON = JSON.parse(errorString);
-
         return errorJSON;
       } catch {
         return {};
@@ -41,10 +40,18 @@ export default function Home() {
     const { failure } = cause ?? {};
 
     const failureCause = failure?.cause;
+
+    let failureTrace: string | undefined;
+    try {
+      failureTrace = eval(failureCause).replaceAll(" Trace ", " \n ");
+    } catch {
+      failureTrace = undefined;
+    }
+
     const failureInfo = failureCause?.info;
     const failureMessage = failureCause?.message;
 
-    setResult(`${failureInfo ?? failureMessage ?? info ?? message ?? error}`);
+    setResult(`${failureTrace ?? failureInfo ?? failureMessage ?? info ?? message ?? error}`);
     console.error(failureCause ?? { error });
   }
 

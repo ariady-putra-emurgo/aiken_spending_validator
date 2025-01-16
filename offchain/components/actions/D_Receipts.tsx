@@ -19,7 +19,7 @@ export default function Receipts(props: { onDeposit: Action; onWithdraw: Action 
         Deposit
       </Button>
 
-      <Button onClick={onWithdraw} className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg" radius="full">
+      <Button onPress={onWithdraw} className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg" radius="full">
         Withdraw
       </Button>
 
@@ -44,7 +44,7 @@ export default function Receipts(props: { onDeposit: Action; onWithdraw: Action 
               </ModalBody>
               <ModalFooter>
                 <Button
-                  onClick={() => onDeposit(lovelace).then(onClose)}
+                  onPress={() => onDeposit(lovelace).then(onClose)}
                   className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg"
                   radius="full"
                 >
