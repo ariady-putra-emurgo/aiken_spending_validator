@@ -1,11 +1,11 @@
 # aiken-spending-validator-offchain
 
-This is an offchain app for `aiken_spending_validator` using **Next.js** and **NextUI**.
+This is an offchain app for `aiken_spending_validator` using **Next.js** and **HeroUI**.
 
 ## Technologies Used
 
 - [Next.js](https://nextjs.org/docs/getting-started)
-- [NextUI](https://nextui.org/)
+- [HeroUI](https://heroui.com/)
 - [Tailwind CSS](https://tailwindcss.com/)
 - [Tailwind Variants](https://tailwind-variants.org)
 - [TypeScript](https://www.typescriptlang.org/)

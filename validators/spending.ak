@@ -110,7 +110,7 @@ validator receipts(pkh: VerificationKeyHash) {
 }
 
 /// CIP-68:
-/// https://developers.cardano.org/docs/governance/cardano-improvement-proposals/CIP-0068
+/// https://web.archive.org/web/20240619002020/https://developers.cardano.org/docs/governance/cardano-improvement-proposals/cip-0068/
 validator cip_68 {
   mint(_redeemer: Void, policy_id: PolicyId, tx: Transaction) {
     // must mint exactly 2 tokens: ref_token & usr_token

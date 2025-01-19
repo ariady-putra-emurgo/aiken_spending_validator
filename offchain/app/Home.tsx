@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import * as siteConfig from "@/config/site";
 
+import { Wallet } from "@/types/cardano";
 import WalletConnectors from "@/components/WalletConnectors";
 import Dashboard from "@/components/Dashboard";
 
-import { Address, Koios, Lucid, LucidEvolution } from "@lucid-evolution/lucid";
-import { Wallet } from "@/types/cardano";
+import { Address, Lucid, LucidEvolution } from "@lucid-evolution/lucid";
+import { network, provider } from "@/config/lucid";
 
 export default function Home() {
   const [lucid, setLucid] = useState<LucidEvolution>();
@@ -13,53 +13,66 @@ export default function Home() {
   const [result, setResult] = useState("");
 
   useEffect(() => {
-    Lucid(new Koios("/koios"), siteConfig.network).then(setLucid).catch(handleError);
+    Lucid(provider, network).then(setLucid).catch(handleError);
     localStorage.clear();
   }, []);
 
-  //#region utils
+  //#region helper functions
   function handleError(error: any) {
     const { info, message } = error;
+    const errorMessage = `${message}`;
 
-    /**
-     * To parse Lucid error
-     * @param error
-     * @returns error JSON
-     */
-    function toJSON(error: any) {
-      try {
-        const errorString = JSON.stringify(error);
-        const errorJSON = JSON.parse(errorString);
-        return errorJSON;
-      } catch {
-        return {};
-      }
-    }
-
-    const { cause } = toJSON(error);
-    const { failure } = cause ?? {};
-
-    const failureCause = failure?.cause;
-
-    let failureTrace: string | undefined;
     try {
-      failureTrace = eval(failureCause).replaceAll(" Trace ", " \n ");
+      // KoiosError:
+      const a = errorMessage.indexOf("{", 1);
+      const b = errorMessage.lastIndexOf("}", errorMessage.lastIndexOf("}") - 1) + 1;
+
+      const rpc = errorMessage.slice(a, b);
+      const jsonrpc = JSON.parse(rpc);
+
+      const errorData = jsonrpc.error.data[0].error.data;
+      try {
+        const { validationError, traces } = errorData;
+
+        setResult(`${validationError} Traces: ${traces.join(", ")}.`);
+        console.error({ [validationError]: traces });
+      } catch {
+        const { reason } = errorData;
+
+        setResult(`${reason}`);
+        console.error(reason);
+      }
     } catch {
-      failureTrace = undefined;
+      function toJSON(error: any) {
+        try {
+          const errorString = JSON.stringify(error);
+          const errorJSON = JSON.parse(errorString);
+          return errorJSON;
+        } catch {
+          return {};
+        }
+      }
+
+      const { cause } = toJSON(error);
+      const { failure } = cause ?? {};
+
+      const failureCause = failure?.cause;
+
+      let failureTrace: string | undefined;
+      try {
+        failureTrace = eval(failureCause).replaceAll(" Trace ", " \n ");
+      } catch {
+        failureTrace = undefined;
+      }
+
+      const failureInfo = failureCause?.info;
+      const failureMessage = failureCause?.message;
+
+      setResult(`${failureTrace ?? failureInfo ?? failureMessage ?? info ?? message ?? error}`);
+      console.error(failureCause ?? { error });
     }
-
-    const failureInfo = failureCause?.info;
-    const failureMessage = failureCause?.message;
-
-    setResult(`${failureTrace ?? failureInfo ?? failureMessage ?? info ?? message ?? error}`);
-    console.error(failureCause ?? { error });
   }
 
-  /**
-   * To handle wallet connection events. We will use the wallet address as our connection state,
-   * eg. empty address == not connected; has address == connected;
-   * @param wallet
-   */
   async function onConnectWallet(wallet: Wallet) {
     try {
       if (!lucid) throw "Uninitialized Lucid";

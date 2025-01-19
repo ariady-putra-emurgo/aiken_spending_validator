@@ -1,6 +1,4 @@
-import * as siteConfig from "@/config/site";
-
-import { Accordion, AccordionItem } from "@nextui-org/accordion";
+import { Accordion, AccordionItem } from "@heroui/accordion";
 
 import { ActionGroup } from "@/types/action";
 import CheckDatum from "./actions/A_CheckDatum";
@@ -31,6 +29,7 @@ import {
   Validator,
   validatorToAddress,
 } from "@lucid-evolution/lucid";
+import { network } from "@/config/lucid";
 
 const Script = {
   SpendCheckDatum: applyDoubleCborEncoding(
@@ -88,7 +87,7 @@ export default function Dashboard(props: {
       deposit: async (lovelace: Lovelace) => {
         try {
           const spendingValidator: SpendingValidator = { type: "PlutusV3", script: Script.SpendCheckDatum };
-          const validatorAddress = validatorToAddress(siteConfig.network, spendingValidator);
+          const validatorAddress = validatorToAddress(network, spendingValidator);
 
           const datum = Data.to(42n);
 
@@ -106,7 +105,7 @@ export default function Dashboard(props: {
       withdraw: async () => {
         try {
           const spendingValidator: SpendingValidator = { type: "PlutusV3", script: Script.SpendCheckDatum };
-          const validatorAddress = validatorToAddress(siteConfig.network, spendingValidator);
+          const validatorAddress = validatorToAddress(network, spendingValidator);
 
           const utxos = await lucid.utxosAt(validatorAddress);
           const redeemer = Data.void();
@@ -124,7 +123,7 @@ export default function Dashboard(props: {
       deposit: async ({ lovelace, secret }: { lovelace: Lovelace; secret: string }) => {
         try {
           const spendingValidator: SpendingValidator = { type: "PlutusV3", script: Script.SpendCheckRedeemer };
-          const validatorAddress = validatorToAddress(siteConfig.network, spendingValidator);
+          const validatorAddress = validatorToAddress(network, spendingValidator);
 
           const hash = createHash("sha256").update(secret, "utf8").digest("hex");
           const datum = Data.to(hash);
@@ -143,7 +142,7 @@ export default function Dashboard(props: {
       withdraw: async (secret: string) => {
         try {
           const spendingValidator: SpendingValidator = { type: "PlutusV3", script: Script.SpendCheckRedeemer };
-          const validatorAddress = validatorToAddress(siteConfig.network, spendingValidator);
+          const validatorAddress = validatorToAddress(network, spendingValidator);
 
           const hash = createHash("sha256").update(secret, "utf8").digest("hex");
           const utxos = (await lucid.utxosAt(validatorAddress)).filter(({ datum }) => datum && `${Data.from(datum, Data.Bytes())}` === hash);
@@ -166,7 +165,7 @@ export default function Dashboard(props: {
           const pkh = paymentCredentialOf(address).hash;
           const spendingScript = applyParamsToScript(Script.SpendScWallet, [pkh]);
           const spendingValidator: SpendingValidator = { type: "PlutusV3", script: spendingScript };
-          const validatorAddress = validatorToAddress(siteConfig.network, spendingValidator);
+          const validatorAddress = validatorToAddress(network, spendingValidator);
 
           const datum = Data.void();
 
@@ -186,7 +185,7 @@ export default function Dashboard(props: {
           const pkh = paymentCredentialOf(address).hash;
           const spendingScript = applyParamsToScript(Script.SpendScWallet, [pkh]);
           const spendingValidator: SpendingValidator = { type: "PlutusV3", script: spendingScript };
-          const validatorAddress = validatorToAddress(siteConfig.network, spendingValidator);
+          const validatorAddress = validatorToAddress(network, spendingValidator);
 
           const utxos = await lucid.utxosAt(validatorAddress);
           const redeemer = Data.void();
@@ -208,7 +207,7 @@ export default function Dashboard(props: {
           const receiptScript = applyParamsToScript(Script.Receipts, [pkh]);
           const receiptValidator: SpendingValidator = { type: "PlutusV3", script: receiptScript };
 
-          const validatorAddress = validatorToAddress(siteConfig.network, receiptValidator);
+          const validatorAddress = validatorToAddress(network, receiptValidator);
 
           const datum = Data.void();
 
@@ -230,7 +229,7 @@ export default function Dashboard(props: {
           const receiptScript = applyParamsToScript(Script.Receipts, [pkh]);
           const receiptValidator: Validator = { type: "PlutusV3", script: receiptScript };
 
-          const validatorAddress = validatorToAddress(siteConfig.network, receiptValidator);
+          const validatorAddress = validatorToAddress(network, receiptValidator);
           const policyID = mintingPolicyToId(receiptValidator);
 
           const utxos = await lucid.utxosAt(validatorAddress);
@@ -275,7 +274,7 @@ export default function Dashboard(props: {
           const redeemer = Data.void();
 
           const spendingValidator: SpendingValidator = { type: "PlutusV3", script: Script.Cip68 };
-          const validatorAddress = validatorToAddress(siteConfig.network, spendingValidator);
+          const validatorAddress = validatorToAddress(network, spendingValidator);
 
           const mintingPolicy: MintingPolicy = { type: "PlutusV3", script: Script.Cip68 };
           const policyID = mintingPolicyToId(mintingPolicy);
@@ -332,7 +331,7 @@ export default function Dashboard(props: {
           const redeemer = Data.void();
 
           const spendingValidator: SpendingValidator = { type: "PlutusV3", script: Script.Cip68 };
-          const validatorAddress = validatorToAddress(siteConfig.network, spendingValidator);
+          const validatorAddress = validatorToAddress(network, spendingValidator);
 
           const refUnit = localStorage.getItem("refUnit");
           const usrUnit = localStorage.getItem("usrUnit");

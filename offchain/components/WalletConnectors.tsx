@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/button";
 import { Wallet } from "@/types/cardano";
 
 export default function WalletConnectors(props: { onConnectWallet: (wallet: Wallet) => Promise<void> }) {
